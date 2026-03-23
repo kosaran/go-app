@@ -1,50 +1,59 @@
-# Welcome to your Expo app 👋
+# GO Train Expo App (Frontend MVP)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This project is an Expo Router app focused on fast, route-first GO train trip planning.
 
-## Get started
+## Why static GTFS in Expo
 
-1. Install dependencies
+GTFS source files in `GO-GTFS/` are large (`stop_times.txt` alone is tens of MB).  
+Parsing those files inside a mobile app causes slow startup, high memory usage, and poor UX.
 
-   ```bash
-   npm install
-   ```
+This app uses a build-time transformer:
 
-2. Start the app
+- Reads GTFS text files once on your machine.
+- Keeps only train routes (`route_type=2`) and only fields needed by the frontend.
+- Outputs a compact static snapshot at `data/go-train-static.json`.
+- App runtime loads that JSON directly (no CSV parsing on-device).
 
-   ```bash
-   npx expo start
-   ```
+## Setup
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+1. Install deps:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Build static schedule snapshot:
 
-## Learn more
+```bash
+npm run build:gtfs
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Optional: build for a specific GTFS service date:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm run build:gtfs -- --serviceDate=20260323
+```
 
-## Join the community
+3. Start Expo:
 
-Join our community of developers creating universal apps.
+```bash
+npm start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## App structure
+
+- `app/(tabs)/index.tsx`: Main planner screen (bottom search pill, animated line/start/destination sheet, favourite journey action, upcoming trip times).
+- `scripts/build-gtfs-static.js`: GTFS transformer script.
+- `data/go-train-static.json`: Generated static schedule snapshot.
+- `lib/go-train-data.ts`: Typed selectors/helpers for route/stop filtering and route segment times.
+- `types/go-train.ts`: Data contracts shared by script and UI.
+
+## Frontend-first best practices used here
+
+- Build-time data transformation (heavy work done before app launch).
+- Typed static data contract (`types/go-train.ts`) to avoid runtime shape drift.
+- Dynamic route and stop filtering with constrained suggestions.
+- Smooth bottom-sheet selection flow with a custom bottom search pill.
+- Favourite journey persisted locally with line, start station, and destination.
+- Friendly 12-hour time display (AM/PM).
+- Minimal screen responsibilities with utility helpers moved to `lib/`.
