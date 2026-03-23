@@ -75,7 +75,7 @@ export default function RoutesTimesScreen() {
 
   const completedJourneyTitle =
     hasCompleteJourney && selectedStartStop && selectedEndStop
-      ? `${selectedStartStop.stopName} -> ${selectedEndStop.stopName}`
+      ? `${selectedStartStop.stopName} to ${selectedEndStop.stopName}`
       : null;
 
   useFocusEffect(
@@ -172,6 +172,13 @@ export default function RoutesTimesScreen() {
       : 'Choose a line, origin, and destination';
 
   const heroAccent = selectedRoute?.routeColor || palette.tint;
+  const heroStartLabel = selectedStartStop
+    ? `From ${selectedStartStop.stopName}`
+    : 'From your selected station';
+  const heroEndLabel = selectedEndStop ? `To ${selectedEndStop.stopName}` : 'To your destination';
+  const heroMetaLine = selectedRoute
+    ? `${selectedRoute.routeShortName} - ${selectedRoute.routeLongName}`
+    : `${goTrainData.stats.routeCount} GO train lines ready to browse`;
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: palette.background }]}>
@@ -261,42 +268,12 @@ export default function RoutesTimesScreen() {
                 </Text>
               </View>
 
-              <Text style={[styles.heroTitle, { color: palette.text }]}>
-                {completedJourneyTitle
-                  ? completedJourneyTitle.replace(' -> ', '\n-> ')
-                  : 'Select your line,\nstart, and destination'}
-              </Text>
-
-              <Text style={[styles.heroSubtitle, { color: palette.icon }]}>
-                {selectedRoute
-                  ? selectedRoute.routeLongName
-                  : `${goTrainData.stats.routeCount} GO train lines ready to browse`}
-              </Text>
-
-              <View style={styles.summaryStack}>
-                <View style={[styles.summaryCard, { borderColor: `${palette.icon}22` }]}>
-                  <Text style={[styles.summaryLabel, { color: palette.icon }]}>Line</Text>
-                  <Text style={[styles.summaryValue, { color: palette.text }]}>
-                    {selectedRoute
-                      ? `${selectedRoute.routeShortName} - ${selectedRoute.routeLongName}`
-                      : 'Choose a train line'}
-                  </Text>
-                </View>
-
-                <View style={[styles.summaryCard, { borderColor: `${palette.icon}22` }]}>
-                  <Text style={[styles.summaryLabel, { color: palette.icon }]}>From</Text>
-                  <Text style={[styles.summaryValue, { color: palette.text }]}>
-                    {selectedStartStop?.stopName || 'Choose a start station'}
-                  </Text>
-                </View>
-
-                <View style={[styles.summaryCard, { borderColor: `${palette.icon}22` }]}>
-                  <Text style={[styles.summaryLabel, { color: palette.icon }]}>To</Text>
-                  <Text style={[styles.summaryValue, { color: palette.text }]}>
-                    {selectedEndStop?.stopName || 'Choose a destination'}
-                  </Text>
-                </View>
+              <View style={styles.heroJourneyStack}>
+                <Text style={[styles.heroStartLine, { color: palette.text }]}>{heroStartLabel}</Text>
+                <Text style={[styles.heroEndLine, { color: palette.text }]}>{heroEndLabel}</Text>
               </View>
+
+              <Text style={[styles.heroSubtitle, { color: palette.icon }]}>{heroMetaLine}</Text>
             </View>
 
             <View style={styles.sectionHeader}>
@@ -400,23 +377,23 @@ const styles = StyleSheet.create({
   heroCard: {
     borderRadius: 28,
     borderWidth: 1,
-    minHeight: 250,
+    minHeight: 192,
     overflow: 'hidden',
-    padding: 20,
+    padding: 18,
   },
   heroOrb: {
     borderRadius: 999,
-    height: 180,
+    height: 156,
     position: 'absolute',
-    right: -20,
-    top: -30,
-    width: 180,
+    right: -16,
+    top: -22,
+    width: 156,
   },
   heroTopRow: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 22,
+    marginBottom: 16,
   },
   routeBadge: {
     borderRadius: 999,
@@ -432,39 +409,26 @@ const styles = StyleSheet.create({
   heroMeta: {
     fontSize: 12,
   },
-  heroTitle: {
-    fontSize: 31,
+  heroJourneyStack: {
+    gap: 4,
+  },
+  heroStartLine: {
+    fontSize: 22,
     fontWeight: '800',
-    lineHeight: 36,
-    maxWidth: '86%',
+    lineHeight: 27,
+    maxWidth: '88%',
+  },
+  heroEndLine: {
+    fontSize: 21,
+    fontWeight: '700',
+    lineHeight: 26,
+    maxWidth: '88%',
   },
   heroSubtitle: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 14,
-    maxWidth: '78%',
-  },
-  summaryStack: {
-    gap: 10,
-    marginTop: 18,
-  },
-  summaryCard: {
-    borderRadius: 18,
-    borderWidth: 1,
-    gap: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  summaryLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
-  summaryValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 10,
+    maxWidth: '90%',
   },
   sectionHeader: {
     alignItems: 'center',
